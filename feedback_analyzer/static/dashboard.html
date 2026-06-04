@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback Analyzer - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; }
+        .header h1 { font-size: 24px; }
+        .header .status { opacity: 0.8; font-size: 14px; margin-top: 5px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stat-card h3 { color: #666; font-size: 14px; text-transform: uppercase; margin-bottom: 10px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #333; }
+        .stat-card .label { color: #888; font-size: 12px; margin-top: 5px; }
+        .sentiment-bar { height: 20px; border-radius: 10px; overflow: hidden; display: flex; margin-top: 10px; }
+        .sentiment-bar .positive { background: #4caf50; }
+        .sentiment-bar .neutral { background: #ffc107; }
+        .sentiment-bar .negative { background: #f44336; }
+        .section { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .section h2 { color: #333; margin-bottom: 15px; font-size: 18px; }
+        .analyze-form { display: flex; gap: 10px; margin-bottom: 20px; }
+        .analyze-form input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .analyze-form button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .analyze-form button:hover { background: #5a6fd6; }
+        .result { padding: 15px; background: #f8f9fa; border-radius: 8px; margin-top: 10px; display: none; }
+        .result.show { display: block; }
+        .result .sentiment { font-size: 24px; font-weight: bold; }
+        .result .sentiment.positive { color: #4caf50; }
+        .result .sentiment.negative { color: #f44336; }
+        .result .sentiment.neutral { color: #ffc107; }
+        .recent-list { max-height: 400px; overflow-y: auto; }
+        .recent-item { padding: 10px; border-bottom: 1px solid #eee; }
+        .recent-item:last-child { border-bottom: none; }
+        .recent-item .text { color: #333; margin-bottom: 5px; }
+        .recent-item .meta { color: #888; font-size: 12px; }
+        .loading { text-align: center; padding: 20px; color: #888; }
+        .error { color: #f44336; padding: 10px; background: #ffebee; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Feedback Analyzer</h1>
+        <div class="status">Alpha v0.1.0 | MVP Dashboard</div>
+    </div>
+    
+    <div class="container">
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Analyzed</h3>
+                <div class="value" id="total-count">-</div>
+                <div class="label">feedback records</div>
+            </div>
+            <div class="stat-card">
+                <h3>Average Sentiment</h3>
+                <div class="value" id="avg-sentiment">-</div>
+                <div class="label">score (-1 to 1)</div>
+            </div>
+            <div class="stat-card">
+                <h3>Positive</h3>
+                <div class="value" id="positive-pct">-</div>
+                <div class="label">of all feedback</div>
+            </div>
+            <div class="stat-card">
+                <h3>Negative</h3>
+                <div class="value" id="negative-pct">-</div>
+                <div class="label">of all feedback</div>
+            </div>
+        </div>
+        
+        <!-- Sentiment Distribution -->
+        <div class="section">
+            <h2>Sentiment Distribution</h2>
+            <div class="sentiment-bar">
+                <div class="positive" id="bar-positive" style="width: 33%"></div>
+                <div class="neutral" id="bar-neutral" style="width: 34%"></div>
+                <div class="negative" id="bar-negative" style="width: 33%"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 12px; color: #666;">
+                <span>🟢 Positive</span>
+                <span>🟡 Neutral</span>
+                <span>🔴 Negative</span>
+            </div>
+        </div>
+        
+        <!-- Analyze Feedback -->
+        <div class="section">
+            <h2>Analyze Feedback</h2>
+            <div class="analyze-form">
+                <input type="text" id="feedback-input" placeholder="Enter feedback text to analyze...">
+                <button onclick="analyzeFeedback()">Analyze</button>
+            </div>
+            <div id="analyze-result" class="result">
+                <div class="sentiment" id="result-label">-</div>
+                <div id="result-score"></div>
+                <div id="result-keywords"></div>
+                <div id="result-category"></div>
+            </div>
+        </div>
+        
+        <!-- Recent Feedback -->
+        <div class="section">
+            <h2>Recent Feedback</h2>
+            <div id="recent-list" class="recent-list">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const API_BASE = '';
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+                
+                document.getElementById('total-count').textContent = data.total_analyzed.toLocaleString();
+                document.getElementById('avg-sentiment').textContent = data.avg_sentiment.toFixed(3);
+                
+                const dist = data.sentiment_distribution;
+                document.getElementById('positive-pct').textContent = (dist.positive * 100).toFixed(1) + '%';
+                document.getElementById('negative-pct').textContent = (dist.negative * 100).toFixed(1) + '%';
+                
+                document.getElementById('bar-positive').style.width = (dist.positive * 100) + '%';
+                document.getElementById('bar-neutral').style.width = (dist.neutral * 100) + '%';
+                document.getElementById('bar-negative').style.width = (dist.negative * 100) + '%';
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+        
+        async function analyzeFeedback() {
+            const input = document.getElementById('feedback-input');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const resultDiv = document.getElementById('analyze-result');
+            resultDiv.classList.add('show');
+            resultDiv.innerHTML = '<div class="loading">Analyzing...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/analyze`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+                const data = await response.json();
+                
+                document.getElementById('result-label').textContent = data.sentiment_label.toUpperCase();
+                document.getElementById('result-label').className = 'sentiment ' + data.sentiment_label;
+                document.getElementById('result-score').textContent = `Score: ${data.sentiment_score.toFixed(4)}`;
+                document.getElementById('result-keywords').textContent = `Keywords: ${data.keywords.join(', ')}`;
+                document.getElementById('result-category').textContent = `Category: ${data.category}`;
+                
+                loadRecent();
+                loadStats();
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function loadRecent() {
+            try {
+                const response = await fetch(`${API_BASE}/feedbacks?limit=10`);
+                const data = await response.json();
+                
+                const list = document.getElementById('recent-list');
+                if (!data || data.length === 0) {
+                    list.innerHTML = '<div class="loading">No feedback yet</div>';
+                    return;
+                }
+                
+                list.innerHTML = data.map(item => `
+                    <div class="recent-item">
+                        <div class="text">${escapeHtml(item.text.substring(0, 100))}${item.text.length > 100 ? '...' : ''}</div>
+                        <div class="meta">
+                            <span class="${item.sentiment_label}">${item.sentiment_label}</span>
+                            • Score: ${item.sentiment_score.toFixed(3)}
+                            • ${item.category}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load recent:', error);
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Load data on page load
+        loadStats();
+        loadRecent();
+        
+        // Enter key to analyze
+        document.getElementById('feedback-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') analyzeFeedback();
+        });
+    </script>
+</body>
+</html>

@@ -42,3 +42,8 @@ docs/
 *.tmp
 *.bak
 *.log
+
+# Database files
+*.db
+*.db-journal
+*.db-wal
