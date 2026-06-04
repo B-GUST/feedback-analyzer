@@ -31,3 +31,14 @@ Thumbs.db
 
 # Maturin
 wheelhouse/
+
+# GCC (Git Context Controller)
+.GCC/
+
+# Internal docs
+docs/
+
+# Temporary files
+*.tmp
+*.bak
+*.log
