@@ -1,70 +1,166 @@
-# 💬 Analizador de Feedback con NLP para Seguridad Psicológica
+# Feedback Analyzer
 
-[![Estado del Proyecto: En Desarrollo](https://img.shields.io/badge/Estado-En%20Desarrollo-yellow.svg)](https://github.com/B-GUST/feedback-analyzer)
+A high-performance feedback analysis system built with **Python + Rust hybrid architecture**. Features cryptographic integrity, gamification rewards, and real-time metrics.
 
-[cite_start]Este proyecto materializa mi enfoque como Líder de IA[cite: 486]: usar la tecnología no para reemplazar, sino para potenciar la humanidad en el trabajo.
+## Features
 
-[cite_start]Es una API de servicio que utiliza **Procesamiento de Lenguaje Natural (NLP)** para analizar el feedback de los empleados y detectar patrones que indiquen un riesgo en la **seguridad psicológica** del equipo, un pilar fundamental para la innovación[cite: 360].
+- **Rust-Powered NLP**: Sentiment analysis, language detection, and keyword extraction via PyO3
+- **Cryptographic Integrity**: SHA-256 hashing, Ed25519 signatures, and Merkle trees
+- **Gamification System**: Points, levels, and badges for contributors
+- **Real-Time Metrics**: Live dashboard with sentiment trends and alerts
+- **Signed Output**: JSON with cryptographic proofs and encrypted Parquet files
 
----
+## Tech Stack
 
-## 🎯 El Problema de Negocio
+| Layer | Technology |
+|-------|------------|
+| API | FastAPI (Python) |
+| NLP Core | whatlang + custom tokenizers (Rust) |
+| Cryptography | ed25519-dalek + sha2 (Rust) |
+| Data | Pydantic + SQLAlchemy |
+| Build | maturin + PyO3 |
 
-La mayoría de los líderes solo obtienen feedback "filtrado" de sus equipos. Las encuestas anónimas son valiosas, pero a menudo son un "cajón de sastre" de texto libre que nadie tiene tiempo de analizar en profundidad.
+## Quick Start
 
-Como resultado, los problemas de cultura, el miedo a hablar y el inicio del burnout son invisibles hasta que es demasiado tarde. Los líderes carecen de un "sistema de alerta temprana" para la salud cultural de sus equipos.
+### Prerequisites
 
-## 💡 La Solución Técnica
+- Python 3.10+
+- Rust 1.70+
+- maturin
 
-Un microservicio de IA (una API) construido con **FastAPI** que expone un endpoint `/analyze`. Este endpoint recibe un bloque de texto anónimo (el feedback) y devuelve un objeto JSON estructurado con dos análisis clave:
-
-1.  **Análisis de Sentimiento:** (Positivo, Negativo, Neutro) para obtener un pulso general.
-2.  **Clasificación de Seguridad Psicológica:** Un modelo entrenado (o que usa *zero-shot classification*) para etiquetar el texto con indicadores de riesgo, como `Miedo a Hablar`, `Cultura de Culpa`, `Falta de Reconocimiento`, etc.
-
-Esto permite a una organización cuantificar lo cualitativo y tomar acciones preventivas.
-
-## ✨ Características Principales
-
-* **API Robusta:** Desarrollada con **FastAPI** para un alto rendimiento y documentación automática (Swagger UI).
-* **Análisis de Sentimiento:** Implementación de un modelo pre-entrenado (ej. de Hugging Face) para una clasificación rápida.
-* **Clasificación de Riesgo (Seguridad Psicológica):** El núcleo del proyecto, un clasificador de NLP para identificar patrones sutiles en el texto.
-* **Contenerización:** Listo para desplegarse como un microservicio usando **Docker**.
-
-## 🛠️ Stack Tecnológico
-
-* **Lenguaje:** `Python`
-* **Servidor API:** `FastAPI`, `Uvicorn`
-* **Modelado de Datos (API):** `Pydantic`
-* **NLP (Modelado):** `Hugging Face Transformers` (para modelos pre-entrenados y *zero-shot*) y/o `spaCy` (para pipelines más ligeros).
-* **Despliegue:** `Docker`
-
-## 📈 Estado del Proyecto
-
-* **Fase 1: API y Modelo Baseline (En Progreso)**
-    * [ ] Estructuración del proyecto FastAPI.
-    * [ ] Definir los modelos Pydantic (Request y Response).
-    * [ ] Implementar el endpoint `/analyze`.
-    * [ ] Integrar un modelo de análisis de sentimiento (baseline).
-* **Fase 2: Modelo de Seguridad Psicológica**
-    * [ ] Definir las categorías de "riesgo de seguridad".
-    * [ ] [INVESTIGACIÓN] Probar un modelo *Zero-Shot Classification* de Transformers.
-    * [ ] (Opcional) Entrenar un clasificador propio si el *zero-shot* no es suficiente.
-* **Fase 3: Despliegue**
-    * [ ] Escribir el `Dockerfile` de la API.
-    * [ ] Crear `docker-compose.yml` para facilitar las pruebas locales.
-
-## 🚀 Cómo Empezar (Próximamente)
+### Installation
 
 ```bash
-# Instrucciones para clonar y ejecutar el proyecto
-git clone [https://github.com/B-GUST/feedback-analyzer.git](https://github.com/B-GUST/feedback-analyzer.git)
+# Clone the repository
+git clone https://github.com/yourusername/feedback-analyzer.git
 cd feedback-analyzer
 
-# (Recomendado) Crear un entorno virtual
-python -m venv venv
-source venv/bin/activate
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # Linux/Mac
+# or .venv\Scripts\activate  # Windows
 
-pip install -r requirements.txt
+# Install dependencies and build Rust extension
+pip install -e .
+```
 
-# Ejecutar el servidor API
-uvicorn main:app --reload
+### Run the API
+
+```bash
+uvicorn feedback_analyzer.api.main:app --reload
+```
+
+The API will be available at `http://localhost:8000`
+
+## API Endpoints
+
+### `POST /analyze`
+Analyze a single feedback item.
+
+```bash
+curl -X POST http://localhost:8000/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"text": "This product is excellent!"}'
+```
+
+Response:
+```json
+{
+  "id": "uuid-...",
+  "text": "This product is excellent!",
+  "language": "en",
+  "sentiment_score": 1.0,
+  "sentiment_label": "positive",
+  "category": "general",
+  "keywords": ["excellent", "product"],
+  "quality_score": 0.85
+}
+```
+
+### `POST /analyze/batch`
+Analyze multiple feedbacks with optional cryptographic signing.
+
+```bash
+curl -X POST http://localhost:8000/analyze/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "feedbacks": [
+      {"text": "Great product!"},
+      {"text": "Terrible service."}
+    ],
+    "output_format": "json_signed"
+  }'
+```
+
+### `GET /stats`
+Real-time statistics dashboard.
+
+### `GET /rewards/{user_id}`
+User reward summary with levels and badges.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│              Python Layer                    │
+│  FastAPI + RewardsEngine + MetricsTracker   │
+└─────────────────────┬───────────────────────┘
+                      │ PyO3
+┌─────────────────────┴───────────────────────┐
+│               Rust Layer                     │
+│  SHA-256 + Ed25519 + Merkle + NLP Core      │
+└─────────────────────────────────────────────┘
+```
+
+## Gamification
+
+- **Levels**: Novice → Collaborator → Analyst → Expert → Master
+- **Badges**: first_feedback, streak_7, quality_star, century, diversity
+- **Points**: Earn based on feedback quality, sentiment, and completeness
+
+## Cryptographic Integrity
+
+Every batch analysis is signed with Ed25519 and includes a Merkle root for verification:
+
+```json
+{
+  "integrity": {
+    "merkle_root": "abc123...",
+    "signature": "ed25519:...",
+    "public_key": "..."
+  }
+}
+```
+
+## Development
+
+### Run Tests
+
+```bash
+pytest tests/
+```
+
+### Build Rust Extension
+
+```bash
+maturin develop
+```
+
+### Project Structure
+
+```
+feedback-analyzer/
+├── src/                    # Rust source code
+│   ├── crypto/            # Hashing, signing, Merkle
+│   ├── nlp/               # Language detection, keywords
+│   └── data/              # Metrics, sentiment scoring
+├── feedback_analyzer/     # Python package
+│   ├── api/               # FastAPI routes
+│   └── core/              # Business logic
+├── tests/                 # Test suite
+└── docs/                  # Documentation
+```
+
+## License
+
+MIT
