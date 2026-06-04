@@ -27,6 +27,12 @@ timeline:
     intent: "Add comprehensive README with API docs and architecture"
     branch: main
     date: "2026-06-04T04:12:28Z"
+
+  - id: C003
+    hash: 60370cc
+    intent: "Fase 2: Integracion candle con modelo bert-tiny"
+    branch: main
+    date: "2026-06-04T04:28:24Z"
 worktrees: []
 
 decisions: []

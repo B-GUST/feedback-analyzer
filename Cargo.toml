@@ -7,6 +7,10 @@ edition = "2021"
 name = "rust_analyzer"
 crate-type = ["cdylib"]
 
+[[bin]]
+name = "train_sentiment"
+path = "src/bin/train_sentiment.rs"
+
 [dependencies]
 pyo3 = { version = "0.28", features = ["extension-module"] }
 ed25519-dalek = "2.2"
@@ -27,6 +31,14 @@ candle-nn = "0.9"
 candle-transformers = "0.9"
 tokenizers = "0.21"
 hf-hub = "0.4"
+
+# For training and export
+safetensors = "0.4"
+candle-datasets = "0.9"
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
 
 [profile.release]
 opt-level = 3
