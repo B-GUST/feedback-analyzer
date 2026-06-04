@@ -1,8 +1,22 @@
+<div align="center">
+
 # Feedback Analyzer
 
-> **Status: Alpha (MVP)** — Software en fase de desarrollo activo.
+![Status](https://img.shields.io/badge/Status-Alpha-yellow?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-0.1.0--alpha-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Rust](https://img.shields.io/badge/Rust-1.70+-000000?style=for-the-badge&logo=rust&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![Candle](https://img.shields.io/badge/Candle-ML-F26522?style=for-the-badge)
 
-Sistema de análisis de feedback con arquitectura híbrida **Python + Rust**, diseñado para ofrecer análisis de sentimiento de alto rendimiento con integridad criptográfica verificable.
+Sistema de análisis de feedback con arquitectura híbrida **Python + Rust**.
+
+Diseñado para ofrecer análisis de sentimiento de alto rendimiento con integridad criptográfica verifiable.
+
+[Documentación](#documentación) · [Instalación](#instalación) · [API](#endpoints) · [Dashboard](#dashboard)
+
+</div>
 
 ---
 
@@ -291,26 +305,42 @@ maturin build --release
 
 ---
 
-## Roadmap (Alpha → Beta)
+## Roadmap
 
+### ✅ Completado
 - [x] Arquitectura Python + Rust
 - [x] Criptografía Ed25519 + Merkle
 - [x] Sistema de recompensas
 - [x] Métricas en tiempo real
 - [x] Modelo de sentimiento entrenado
+- [x] Soporte Parquet encriptado
+- [x] Persistencia en base de datos
+- [x] Autenticación JWT
+- [x] Rate limiting
+- [x] Dashboard web
+
+### 🔜 Próximamente
 - [ ] Entrenamiento con modelo BERT completo
-- [ ] Soporte Parquet encriptado
-- [ ] Persistencia en base de datos
-- [ ] Autenticación JWT
-- [ ] Rate limiting
-- [ ] Dashboard web
+- [ ] WebSocket para métricas en vivo
+- [ ] Exportación a CSV
+- [ ] Multi-idioma (es, pt, fr)
 
 ---
 
 ## Licencia
 
-MIT
+Distribuido bajo la licencia MIT. Ver `LICENSE` para más información.
 
 ---
 
-**Alpha v0.1.0** — Desarrollado como proyecto de portafolio demostrando arquitectura híbrida Python + Rust con aplicaciones criptográficas.
+<div align="center">
+
+![Built with](https://img.shields.io/badge/Built%20with-Python%20%2B%20Rust-red?style=for-the-badge)
+![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge)
+![Issues](https://img.shields.io/github/issues/B-GUST/feedback-analyzer-yellow?style=for-the-badge)
+
+**Alpha v0.1.0**
+
+Desarrollado como proyecto de portafolio demostrando arquitectura híbrida Python + Rust con aplicaciones criptográficas.
+
+</div>
