@@ -19,6 +19,14 @@ try:
 except ImportError:
     HAS_RUST = False
 
+# Try to initialize candle sentiment model
+_candle_sentiment = None
+if HAS_RUST:
+    try:
+        _candle_sentiment = rust.CandleSentiment()
+    except Exception:
+        pass
+
 
 class Analyzer:
     """Main analysis engine."""
@@ -37,7 +45,7 @@ class Analyzer:
         else:
             language = self._detect_language_fallback(text)
         
-        # Sentiment analysis
+        # Sentiment analysis - use rule-based (candle available for future ML models)
         if HAS_RUST:
             sentiment_score = rust.calculate_sentiment_score(text)
         else:

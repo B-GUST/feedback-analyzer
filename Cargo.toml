@@ -21,6 +21,13 @@ thiserror = "2"
 whatlang = "0.16"
 unicode-segmentation = "1.12"
 
+# Candle for ML inference
+candle-core = "0.9"
+candle-nn = "0.9"
+candle-transformers = "0.9"
+tokenizers = "0.21"
+hf-hub = "0.4"
+
 [profile.release]
 opt-level = 3
 lto = true

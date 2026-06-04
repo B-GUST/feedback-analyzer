@@ -21,6 +21,12 @@ timeline:
     intent: "Fase 1-4 completa: API + Rust core + recompensas + metricas + criptografia"
     branch: main
     date: "2026-06-04T04:12:01Z"
+
+  - id: C002
+    hash: 37517bb
+    intent: "Add comprehensive README with API docs and architecture"
+    branch: main
+    date: "2026-06-04T04:12:28Z"
 worktrees: []
 
 decisions: []

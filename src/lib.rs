@@ -7,6 +7,7 @@ pub mod nlp;
 use crypto::{hash_data, sign_data, verify_signature, generate_keypair};
 use crypto::merkle::{compute_merkle_root, generate_merkle_proof, verify_merkle_proof, build_merkle_tree};
 use nlp::{detect_language, extract_keywords};
+use nlp::candle_sentiment::CandleSentiment;
 use data::{calculate_sentiment_score, calculate_quality_score};
 
 /// Feedback Analyzer Rust Core
@@ -31,6 +32,9 @@ fn rust_analyzer(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Data/Metrics functions
     m.add_function(wrap_pyfunction!(calculate_sentiment_score, m)?)?;
     m.add_function(wrap_pyfunction!(calculate_quality_score, m)?)?;
+    
+    // Candle ML class
+    m.add_class::<CandleSentiment>()?;
     
     Ok(())
 }
