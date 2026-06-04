@@ -1,0 +1,20 @@
+version: 2
+mode: git
+created: "2026-06-04T03:28:43Z"
+config:
+  proactive_commits: true
+  worktree_ttl: 24h
+  bridge_to_aiyoucli: auto
+
+current_branch: main
+
+timeline:
+  - id: INIT
+    hash: 73a4da3
+    intent: "gcc initialized"
+    branch: main
+    date: "2026-06-04T03:28:43Z"
+
+worktrees: []
+
+decisions: []
